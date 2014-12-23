@@ -1,0 +1,5 @@
+bin/
+obj/
+HomeAutomation.csproj.user
+OnBoardFlash.dat
+OnBoardFlash.dat.smd
