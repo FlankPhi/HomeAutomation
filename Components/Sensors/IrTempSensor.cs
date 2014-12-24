@@ -2,8 +2,11 @@ using Microsoft.SPOT.Hardware;
 
 namespace HomeAutomation
 {
-    public class IrTempSensor
+    public class IrTempSensor : IComponent
     {
+
+        public IController Parent { get; private set; }
+
         public enum RamRegisters : byte
         {
             AreaTemperature = 0x06,
@@ -30,12 +33,12 @@ namespace HomeAutomation
             PwmSelected = 0x00
         }
         public I2CDevice.Configuration Config { get; private set; }
-
-        public IrTempSensor(byte i2CAddress, byte frequency)
+        public IrTempSensor(byte i2CAddress, byte frequency, IController parent)
         {
             Config = new I2CDevice.Configuration(i2CAddress, frequency);
+            Parent = parent;
+            Parent.AddComponent(this);
         }
-
         public double CalculateTemp(byte[] registerValue, Temp units)
         {
             double temp = ((registerValue[1] & 0x007F) << 8) + registerValue[0];
@@ -53,7 +56,6 @@ namespace HomeAutomation
                 default:
                     return 0;
             }
-        }
-
+        }        
     }
 }

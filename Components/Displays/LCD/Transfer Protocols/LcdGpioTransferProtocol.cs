@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Text;
 using System.Threading;
 using Microsoft.SPOT.Hardware;
@@ -23,6 +24,7 @@ namespace HomeAutomation
         public LcdGpioTransferProtocol(Cpu.Pin rsPin, Cpu.Pin enablePin,
             Cpu.Pin d4, Cpu.Pin d5, Cpu.Pin d6, Cpu.Pin d7)
         {
+            
             _rsPort = new OutputPort(rsPin, false);
             _enablePort = new OutputPort(enablePin, false);
             _d4 = new OutputPort(d4, false);

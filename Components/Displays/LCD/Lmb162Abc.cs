@@ -43,7 +43,7 @@ namespace HomeAutomation
             Font5X11 = 0x04,
             Font5X8 = 0x00
         }
-        public IController Parent { get; set; }
+        public IController Parent { get; private set; }
         private bool _isVisible;
         private bool _showCursor;
         private bool _isBlinking;
@@ -85,12 +85,14 @@ namespace HomeAutomation
         private readonly ILcdTransferProtocol _transferProtocol;
 
         public Lmb162Abc(Cpu.Pin rsPin, Cpu.Pin enablePin,
-            Cpu.Pin d4, Cpu.Pin d5, Cpu.Pin d6, Cpu.Pin d7, int columnCount, int rowCount)
+            Cpu.Pin d4, Cpu.Pin d5, Cpu.Pin d6, Cpu.Pin d7, int columnCount, int rowCount, IController parent)
         {
+            Parent = parent;
             _transferProtocol = new LcdGpioTransferProtocol(rsPin, enablePin, d4, d5, d6, d7);
             ColumnCount = columnCount;
             RowCount = rowCount;
             _transferProtocol.Initialize(this);                      
+            Parent.AddComponent(this);
         }
 
         public void WriteLine(string text)

@@ -11,19 +11,21 @@ namespace HomeAutomation
 
 
         private readonly InterruptPort _pir;
+
+        public IController Parent { get; private set; }
+
         //private readonly Lcd _display;
 
-        public MotionSensor(Cpu.Pin inputPin, IController parent)
+        public MotionSensor(Cpu.Pin inputPin, IController parent, bool onByDefault)
         {
             _pir = new InterruptPort(inputPin, false, ResistorModes.PullDown, InterruptModes.InterruptEdgeHigh);
             Parent = parent;
+            Parent.AddComponent(this);
+            if(onByDefault) Activate();
         }
-
-        public IController Parent { get; set; }
-
         public void Activate()
         {
-            _pir.OnInterrupt += OnTrip;
+            _pir.OnInterrupt += OnTrip;        
         }
 
         public void Deactivate()
@@ -33,9 +35,9 @@ namespace HomeAutomation
 
         private void OnTrip(uint data1, uint data2, DateTime time)
         {
-            Debug.Print("Alarm tripped.");
-            Thread.Sleep(50);
-            _pir.ClearInterrupt();
+            //Debug.Print("Alarm tripped.");
+            //Thread.Sleep(50);
+            //_pir.ClearInterrupt();
         }
 
 

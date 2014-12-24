@@ -10,6 +10,6 @@ namespace HomeAutomation
 
         void Initialize(ILcd parent);
         void SendLine(string data, int delay, bool newLine);
-        void SendCommand(byte command);
+        //void SendCommand(byte command);
     }
 }

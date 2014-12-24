@@ -2,6 +2,6 @@ namespace HomeAutomation
 {
     public interface IComponent
     {
-        IController Parent { get; set; }
+        IController Parent { get; }
     }
 }
