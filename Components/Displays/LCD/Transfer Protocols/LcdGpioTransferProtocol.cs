@@ -8,7 +8,7 @@ namespace HomeAutomation.Components.Displays.LCD.Transfer_Protocols
 {
     public class LcdGpioTransferProtocol : ILcdTransferProtocol
     {
-        private ILcd _parent;
+        private IDisplay _parent;
 
         private readonly OutputPort _rsPort;
         private readonly OutputPort _enablePort;
@@ -43,7 +43,7 @@ namespace HomeAutomation.Components.Displays.LCD.Transfer_Protocols
             SendCommand(command);
         }
 
-        public void Initialize(ILcd parentLcd)
+        public void Initialize(IDisplay parentLcd)
         {
             _parent = parentLcd;
 
@@ -156,13 +156,17 @@ namespace HomeAutomation.Components.Displays.LCD.Transfer_Protocols
 
         public void SendLine(string text, int delay, bool newLine)
         {
-            if (newLine) _parent.CursorPosition = 0;
-            foreach (var textChar in text.ToCharArray())
+            var lockObject = new object();
+            lock (lockObject)
             {
-                ResetLines();
-                SendData(Encoding.UTF8.GetBytes(textChar.ToString()));
-                _parent.CursorPosition += 1;
-                Thread.Sleep(delay);
+                if (newLine) _parent.CursorPosition = 0;
+                foreach (var textChar in text.ToCharArray())
+                {
+                    ResetLines();
+                    SendData(Encoding.UTF8.GetBytes(textChar.ToString()));
+                    _parent.CursorPosition += 1;
+                    Thread.Sleep(delay);
+                }
             }
         }
 

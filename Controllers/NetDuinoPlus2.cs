@@ -9,7 +9,7 @@ namespace HomeAutomation.Controllers
 {
     public sealed class NetDuinoPlus2 : IController
     {
-        public event SensorEvent RegisterEvent;
+        
         
         public NetworkDaemon NetDaemon { get; private set; }
         public IPAddress ServerIp { get; private set; }
@@ -30,11 +30,9 @@ namespace HomeAutomation.Controllers
         {
             if(!Components.Contains(component)) Components.Add(component);
         }
-
-        private void Execute(IComponent component)
-        {
-            if (RegisterEvent != null) RegisterEvent(component);
-        }
+        
+        
+        
 
         
     }

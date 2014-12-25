@@ -8,7 +8,7 @@ namespace HomeAutomation.Abstract
 
         void UpdateDisplayOptions();
 
-        void Initialize(ILcd parent);
+        void Initialize(IDisplay parent);
         void SendLine(string data, int delay, bool newLine);
         //void SendCommand(byte command);
     }

@@ -22,6 +22,7 @@ namespace HomeAutomation.Network
                 if (!_waitForConnection.WaitOne(4000, false))
                 {
                     connectorThread.Abort();
+                    _socket.Close();
                     _socket = null;
                 }
                 return _socket;

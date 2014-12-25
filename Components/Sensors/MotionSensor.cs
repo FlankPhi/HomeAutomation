@@ -1,44 +1,32 @@
 using System;
+using System.Collections;
 using HomeAutomation.Abstract;
+using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware.Netduino;
 
 namespace HomeAutomation.Components.Sensors
 {
-    public class MotionSensor : IComponent
+    public delegate void Trigger();
+    public sealed class MotionSensor : IComponent
     {
 
+        public event Trigger MotionTriggered;
 
         private readonly InterruptPort _pir;
 
-        public IController Parent { get; private set; }
-
-        //private readonly Lcd _display;
-
-        public MotionSensor(Cpu.Pin inputPin, IController parent, bool onByDefault)
+        public MotionSensor(Cpu.Pin inputPin, IController controller)
         {
             _pir = new InterruptPort(inputPin, false, ResistorModes.PullDown, InterruptModes.InterruptEdgeHigh);
-            Parent = parent;
-            Parent.AddComponent(this);
-            if(onByDefault) Activate();
+            Controller = controller;
+            //Controller.AddComponent(this);
+            _pir.OnInterrupt += OnMotionDetected;
         }
-        public void Activate()
+        private void OnMotionDetected(uint data1, uint data2, DateTime time)
         {
-            _pir.OnInterrupt += OnTrip;        
+            if (MotionTriggered != null) MotionTriggered.Invoke();
         }
 
-        public void Deactivate()
-        {
-            _pir.OnInterrupt -= OnTrip;
-        }
-
-        private void OnTrip(uint data1, uint data2, DateTime time)
-        {
-            //Debug.Print("Alarm tripped.");
-            //Thread.Sleep(50);
-            //_pir.ClearInterrupt();
-        }
-
-
+        public IController Controller { get; private set; }
     }
 }

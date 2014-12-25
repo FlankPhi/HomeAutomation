@@ -1,10 +1,11 @@
+using System.Collections;
 using HomeAutomation.Abstract;
 using HomeAutomation.Components.Displays.LCD.Transfer_Protocols;
 using Microsoft.SPOT.Hardware;
 
 namespace HomeAutomation.Components.Displays.LCD
 {
-    public class Lmb162Abc : ILcd
+    public class Lmb162Abc : IDisplay
     {
         public enum Command : byte
         {
@@ -44,7 +45,7 @@ namespace HomeAutomation.Components.Displays.LCD
             Font5X11 = 0x04,
             Font5X8 = 0x00
         }
-        public IController Parent { get; private set; }
+        public IController Controller { get; private set; }
         private bool _isVisible;
         private bool _showCursor;
         private bool _isBlinking;
@@ -82,23 +83,23 @@ namespace HomeAutomation.Components.Displays.LCD
                 _transferProtocol.UpdateDisplayOptions();
             }
         }
-
+        
         private readonly ILcdTransferProtocol _transferProtocol;
 
         public Lmb162Abc(Cpu.Pin rsPin, Cpu.Pin enablePin,
-            Cpu.Pin d4, Cpu.Pin d5, Cpu.Pin d6, Cpu.Pin d7, int columnCount, int rowCount, IController parent)
+            Cpu.Pin d4, Cpu.Pin d5, Cpu.Pin d6, Cpu.Pin d7, int columnCount, int rowCount, IController controller)
         {
-            Parent = parent;
+            Controller = controller;
             _transferProtocol = new LcdGpioTransferProtocol(rsPin, enablePin, d4, d5, d6, d7);
             ColumnCount = columnCount;
             RowCount = rowCount;
             _transferProtocol.Initialize(this);                      
-            Parent.AddComponent(this);
+            //Controller.AddComponent(this);
         }
 
         public void WriteLine(string text)
         {
-            _transferProtocol.SendLine(text);
+            _transferProtocol.SendLine(text,0,true);
         }
 
         public void WriteLine(string text, int delay, bool newLine)
@@ -108,7 +109,7 @@ namespace HomeAutomation.Components.Displays.LCD
 
         public void Write(string text)
         {
-            _transferProtocol.SendLine(text);
+            _transferProtocol.SendLine(text,0,false);
         }
 
         public void Clear()
@@ -120,12 +121,5 @@ namespace HomeAutomation.Components.Displays.LCD
         {
             _transferProtocol.MoveCursor(column, row);
         }
-
-        public void Write(string data, int delay, bool newLine)
-        {
-            _transferProtocol.SendLine(data, delay, newLine);
-        }
-
-        
     }
 }

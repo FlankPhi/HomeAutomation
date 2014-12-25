@@ -8,7 +8,7 @@ namespace HomeAutomation.Network
     {
         
         public Socket KeepAlive { get; private set; }
-        private Socket CommSocket { get; set; }
+        public Socket CommSocket { get; set; }
         //public IPEndPoint DataEndPoint { get; private set; }
         //public IPEndPoint KeepAliveEndPoint { get; private set; }
         private readonly int _keepAlivePort;

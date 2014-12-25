@@ -43,7 +43,6 @@
     <Compile Include="Components\Displays\LCD\Transfer Protocols\I2CBus.cs" />
     <Compile Include="Abstract\IComponent.cs" />
     <Compile Include="Abstract\IController.cs" />
-    <Compile Include="Abstract\ILcd.cs" />
     <Compile Include="Abstract\ILcdTransferProtocol.cs" />
     <Compile Include="Abstract\ITransferProtocol.cs" />
     <Compile Include="Components\Displays\LCD\Lmb162Abc.cs" />

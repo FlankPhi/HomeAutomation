@@ -10,8 +10,7 @@ namespace HomeAutomation.Network
     public class NetworkDaemon
     {
         private static NetworkDaemon _daemon;
-        public ServerConnection ServerConnection { get; private set; }
-        
+        public ServerConnection ServerConnection { get; private set; }        
         private NetworkDaemon(IController parent)
         {
             ServerConnection = new ServerConnection(parent);
@@ -23,7 +22,6 @@ namespace HomeAutomation.Network
         {
             return _daemon ?? (_daemon = new NetworkDaemon(parent));
         }
-
         private void KeepAlive()
         {
             while (true)
@@ -32,11 +30,13 @@ namespace HomeAutomation.Network
                 
                 if (!SendData(ServerConnection.KeepAlive, "Hello?"))
                 {
-                    Debug.Print("Error Sending Keepalive.");
+                    Debug.Print("Error Sending Keep-alive. Attempting reconnection.");
+                    if(ServerConnection.KeepAlive != null) ServerConnection.KeepAlive.Close();
+                    if (ServerConnection.CommSocket != null) ServerConnection.CommSocket.Close();
                     ServerConnection.Connect();
                     continue;
                 }
-                Debug.Print("Sent Hello?...");
+                Debug.Print("Keep-alive sent successfully");
                 var receivedData = ReceiveData(ServerConnection.KeepAlive, size: 6);
                 var datastring = new String(Encoding.UTF8.GetChars(receivedData));
                 Debug.Print(datastring);                                  
@@ -60,19 +60,18 @@ namespace HomeAutomation.Network
                     break;
                 }
 
-            } while (received < size);
+            } while (received < size & socket.Poll(100,SelectMode.SelectRead) );
             socket.ReceiveTimeout = 0;
             
             return message;
-        }
-
-        
+        }       
         public bool SendData(Socket socket, object data)
         {
             if (socket == null) return false;
             try
             {
                 socket.Send(Encoding.UTF8.GetBytes(data.ToString()));
+                return true;
             }
             catch (SocketException e)
             {
@@ -80,8 +79,6 @@ namespace HomeAutomation.Network
                 return false;
             }
             
-            return true;
-
 
         }
     }
