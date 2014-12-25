@@ -1,7 +1,8 @@
-using System;
+using HomeAutomation.Abstract;
+using HomeAutomation.Components.Displays.LCD.Transfer_Protocols;
 using Microsoft.SPOT.Hardware;
 
-namespace HomeAutomation
+namespace HomeAutomation.Components.Displays.LCD
 {
     public class Lmb162Abc : ILcd
     {

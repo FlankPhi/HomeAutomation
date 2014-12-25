@@ -1,4 +1,4 @@
-namespace HomeAutomation
+namespace HomeAutomation.Abstract
 {
     public interface ILcd : IDisplay, IComponent
     {

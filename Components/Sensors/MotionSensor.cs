@@ -1,10 +1,9 @@
 using System;
-using System.Threading;
-using Microsoft.SPOT;
+using HomeAutomation.Abstract;
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware.Netduino;
 
-namespace HomeAutomation
+namespace HomeAutomation.Components.Sensors
 {
     public class MotionSensor : IComponent
     {

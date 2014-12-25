@@ -1,10 +1,10 @@
 using System;
-using System.Collections;
 using System.Text;
 using System.Threading;
+using HomeAutomation.Abstract;
 using Microsoft.SPOT.Hardware;
 
-namespace HomeAutomation
+namespace HomeAutomation.Components.Displays.LCD.Transfer_Protocols
 {
     public class LcdGpioTransferProtocol : ILcdTransferProtocol
     {

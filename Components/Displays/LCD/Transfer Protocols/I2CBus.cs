@@ -1,7 +1,7 @@
 using System;
 using Microsoft.SPOT.Hardware;
 
-namespace HomeAutomation
+namespace HomeAutomation.Components.Displays.LCD.Transfer_Protocols
 {
     public class I2CBus : IDisposable
     {

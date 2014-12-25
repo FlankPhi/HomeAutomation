@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
+using HomeAutomation.Components.Displays.LCD;
+using HomeAutomation.Components.Sensors;
+using HomeAutomation.Controllers;
+
 using Microsoft.SPOT.Hardware;
 using SecretLabs.NETMF.Hardware;
 using SecretLabs.NETMF.Hardware.Netduino;
@@ -8,7 +12,6 @@ using SecretLabs.NETMF.Hardware.Netduino;
 
 namespace HomeAutomation
 {
-   // public delegate void SensorReport(IComponent caller);
     public static class Program
     {
         
@@ -23,11 +26,6 @@ namespace HomeAutomation
                             16,2, netduino);                                                                          //rows and columns    
             var tempSensor = new IrTempSensor(0x5a, 59, netduino);
             var motionSensor = new MotionSensor(Pins.GPIO_PIN_D7, netduino, true);
-            
-
-
-            
-           
 
             while (true)
             {
@@ -37,8 +35,6 @@ namespace HomeAutomation
                 gpioLcd.SetCursor(11,0);
                 gpioLcd.WriteLine(temp.ToString().Substring(0, 5));
 
-                //networkDaemon.SendData(connectionIndex, temp);
-                
                 Thread.Sleep(1000);
             }          
         }

@@ -1,6 +1,7 @@
+using HomeAutomation.Abstract;
 using Microsoft.SPOT.Hardware;
 
-namespace HomeAutomation
+namespace HomeAutomation.Components.Sensors
 {
     public class IrTempSensor : IComponent
     {

@@ -1,34 +1,29 @@
 using System.Net;
-using System.Threading;
+using HomeAutomation.Abstract;
+using HomeAutomation.Components.Displays.LCD.Transfer_Protocols;
+using HomeAutomation.Etc.Delegates;
 using HomeAutomation.Etc.Generic;
-using Microsoft.SPOT.Hardware;
+using HomeAutomation.Network;
 
-namespace HomeAutomation
+namespace HomeAutomation.Controllers
 {
     public sealed class NetDuinoPlus2 : IController
     {
-
-        //private readonly I2CBus _twiBus;
-        private readonly NetworkDaemon _netDaemon;
+        public event SensorEvent RegisterEvent;
         
-        private readonly ClientConnection _tcpConnection;
-
-        public List Components { get; private set; }
-
-
-        public event SensorEvent  RegisterEvent;
-
+        public NetworkDaemon NetDaemon { get; private set; }
+        public IPAddress ServerIp { get; private set; }
+        public int ServerPort { get; private set; }
         public I2CBus TwiBus { get; private set; }
-
-        private NetDuinoPlus2()
-        {
-            TwiBus = I2CBus.GetInstance();
-            _netDaemon = NetworkDaemon.GetInstance();
-            Components = new List(typeof(IComponent));                       
-        }
-        public NetDuinoPlus2(IPAddress serverAddress, int serverPort) : this()
+        public List Components { get; private set; }
+      
+        public NetDuinoPlus2(IPAddress serverAddress, int serverPort) 
         {           
-            _tcpConnection = _netDaemon.CreateClientConnection(serverAddress, serverPort, this);            
+            ServerIp = serverAddress;
+            ServerPort = serverPort;
+            TwiBus = I2CBus.GetInstance();
+            NetDaemon = NetworkDaemon.GetInstance(this);
+            Components = new List(typeof(IComponent));
         }
 
         public void AddComponent(IComponent component)

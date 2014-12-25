@@ -1,6 +1,7 @@
 using System.Collections;
+using HomeAutomation.Etc.Delegates;
 
-namespace HomeAutomation
+namespace HomeAutomation.Etc.Generic
 {
     sealed class ConditionalEnumerable : IEnumerable
     {
