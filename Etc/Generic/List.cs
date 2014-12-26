@@ -14,6 +14,7 @@ namespace HomeAutomation.Etc.Generic
         {
             _myType = type;
             _list = new ArrayList();
+            _list.Remove(0);
             _index = 0;
         }
 
@@ -21,16 +22,15 @@ namespace HomeAutomation.Etc.Generic
         {
             _myType = type;
             _list = new ArrayList {Capacity = size};
+            _index = 0;
         }
 
         public void Add(object obj)
         {
-            //var object = (_myType) ;
-            //if (component == null)
-            //    throw new ArgumentException("Incorrect type. Type expected:" + _myType +
-            //                                " Type received:" + obj.GetType());
-            
-            //bug This needs to validate type... how?
+            if (obj.GetType().GetInterfaces().FirstOrDefault() != _myType && 
+                obj.GetType() != _myType &&
+                obj.GetType().BaseType != _myType) throw new Exception("Incorrect type.");
+
             _list.Add(obj);
             _index++;
         }

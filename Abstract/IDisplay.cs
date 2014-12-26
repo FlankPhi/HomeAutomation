@@ -1,6 +1,6 @@
 namespace HomeAutomation.Abstract
 {
-    public interface IDisplay : IComponent
+    public interface IDisplay
     {
         int RowCount { get; }
         int ColumnCount { get; }

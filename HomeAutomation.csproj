@@ -34,7 +34,6 @@
   <Import Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <ItemGroup>
     <Compile Include="Abstract\IDisplay.cs" />
-    <Compile Include="Etc\Delegates\SensorEvent.cs" />
     <Compile Include="Network\Connector.cs" />
     <Compile Include="Network\ServerConnection.cs" />
     <Compile Include="Components\Sensors\IrTempSensor.cs" />
@@ -56,7 +55,6 @@
     <Compile Include="Network\NetworkDaemon.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Etc\Delegates\Selector.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Json.NetMF">

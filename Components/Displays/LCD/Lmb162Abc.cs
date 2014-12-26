@@ -5,7 +5,7 @@ using Microsoft.SPOT.Hardware;
 
 namespace HomeAutomation.Components.Displays.LCD
 {
-    public class Lmb162Abc : IDisplay
+    public class Lmb162Abc : IComponent, IDisplay
     {
         public enum Command : byte
         {

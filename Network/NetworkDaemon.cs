@@ -3,69 +3,81 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using HomeAutomation.Abstract;
+using HomeAutomation.Etc.Generic;
 using Microsoft.SPOT;
 
 namespace HomeAutomation.Network
 {
-    public class NetworkDaemon
+    public class ConnectionManager
     {
-        private static NetworkDaemon _daemon;
-        public ServerConnection ServerConnection { get; private set; }        
-        private NetworkDaemon(IController parent)
+        private static ConnectionManager _daemon;
+        
+        private ServerConnection _serverConnection;
+        private IController _parent;
+        private List _serverConnections;
+        public ConnectionManager(ServerConnection connection)
         {
-            ServerConnection = new ServerConnection(parent);
-               
+            _serverConnections = new List(typeof(ServerConnection));
+            _serverConnections.Add(connection);
+            _serverConnection = connection;            
             var keepAliveThread = new Thread(KeepAlive);
             keepAliveThread.Start();
         }
-        public static NetworkDaemon GetInstance(IController parent)
-        {
-            return _daemon ?? (_daemon = new NetworkDaemon(parent));
-        }
-        private void KeepAlive()
+        
+        private void KeepAlive() // bug - this is becoming more and more sloppy - a send and receive in the same method? talk about breaking srp... maybe plug it into server connection?
         {
             while (true)
             {
                 Thread.Sleep(30000);
-                
-                if (!SendData(ServerConnection.KeepAlive, "Hello?"))
+
+                if (!SendUtf8(_serverConnection.DebugSocket, "Hello?"))
                 {
                     Debug.Print("Error Sending Keep-alive. Attempting reconnection.");
-                    if(ServerConnection.KeepAlive != null) ServerConnection.KeepAlive.Close();
-                    if (ServerConnection.CommSocket != null) ServerConnection.CommSocket.Close();
-                    ServerConnection.Connect();
+                    _serverConnection.Connect();
                     continue;
                 }
-                Debug.Print("Keep-alive sent successfully");
-                var receivedData = ReceiveData(ServerConnection.KeepAlive, size: 6);
-                var datastring = new String(Encoding.UTF8.GetChars(receivedData));
-                Debug.Print(datastring);                                  
+                
+                Debug.Print(GetString(_serverConnection,_serverConnection.DebugSocket));                                  
             }          
         }
 
-        public static byte[] ReceiveData(Socket socket, int timeout = 10000, int size = 4096, int offset = 0)
+        public string GetString(ServerConnection connection, Socket socket, int size = 4096, int offset = 0, int timeout = 10000)
         {
-            var message = new byte[size];
-            var received = 0;
-            socket.ReceiveTimeout = timeout;
-            do
-            {
-                try
-                {
-                    received += socket.Receive(message, offset + received, size - received, SocketFlags.None);
-                }
-                catch (SocketException ex)
-                {
-                    Debug.Print("Receive timeout reached. Error code: "+ ex.Message);
-                    break;
-                }
+            if (socket.Available == 0) return null;
 
-            } while (received < size & socket.Poll(100,SelectMode.SelectRead) );
-            socket.ReceiveTimeout = 0;
+            var receivedData = connection.ReceiveData(socket,timeout,size,offset);
+            return new String(Encoding.UTF8.GetChars(receivedData));
+        }
+
+        public byte[] GetByteArray(ServerConnection connection, Socket socket, int size = 4096, int offset = 0,
+            int timeout = 10000)
+        {
+            return socket.Available == 0 ? null : connection.ReceiveData(socket, timeout, size, offset);
+        }
+
+        //public static byte[] ReceiveData(Socket socket, int timeout = 10000, int size = 4096, int offset = 0)
+        //{
+        //    var message = new byte[size];
+        //    var received = 0;
+        //    socket.ReceiveTimeout = timeout;
+        //    do
+        //    {
+        //        try
+        //        {
+        //            received += socket.Receive(message, offset + received, size - received, SocketFlags.None);
+        //        }
+        //        catch (SocketException ex)
+        //        {
+        //            Debug.Print("Receive timeout reached. Error code: "+ ex.Message);
+        //            break;
+        //        }
+
+        //    } while (received < size & socket.Poll(100,SelectMode.SelectRead) );
+        //    socket.ReceiveTimeout = 0;
             
-            return message;
-        }       
-        public bool SendData(Socket socket, object data)
+        //    return message;
+        //}
+        private static bool SendUtf8(Socket socket, object data)
         {
             if (socket == null) return false;
             try
@@ -75,7 +87,7 @@ namespace HomeAutomation.Network
             }
             catch (SocketException e)
             {
-                Debug.Print("Disconnected: error code " + e.ErrorCode);
+                Debug.Print("Could not send: error code " + e.ErrorCode);
                 return false;
             }
             

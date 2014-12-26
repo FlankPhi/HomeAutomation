@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using HomeAutomation.Abstract;
+using HomeAutomation.Controllers;
 using Microsoft.SPOT.Hardware;
 
 namespace HomeAutomation.Components.Sensors
@@ -40,7 +41,7 @@ namespace HomeAutomation.Components.Sensors
             while (true)
             {
                 Thread.Sleep(UpdateInterval);
-                _latestTemp = CalculateTemp(Controller.TwiBus.ReadRegister(_config, (byte)DefaultRegister, 1000), DefaultTemp);
+                _latestTemp = CalculateTemp(((NetDuinoPlus2)Controller).TwiBus.ReadRegister(_config, (byte)DefaultRegister, 1000), DefaultTemp);
                 OnUpdate();
             }
         }
@@ -101,16 +102,4 @@ namespace HomeAutomation.Components.Sensors
 
     
 }
-
-
-
-
-//_obj1C = CalculateTemp(Controller.TwiBus.ReadRegister(Config, (byte) RamRegisters.ObjectTempOne, 1000),Temp.Celcius);
-//_obj1F = CalculateTemp(Controller.TwiBus.ReadRegister(Config, (byte) RamRegisters.ObjectTempOne, 1000),Temp.Fahrenheit);
-//_obj1K = CalculateTemp(Controller.TwiBus.ReadRegister(Config, (byte) RamRegisters.ObjectTempOne, 1000),Temp.Kelvin);
-//_obj2C = CalculateTemp(Controller.TwiBus.ReadRegister(Config, (byte) RamRegisters.ObjectTempTwo, 1000),Temp.Celcius);
-//_obj2F = CalculateTemp(Controller.TwiBus.ReadRegister(Config, (byte) RamRegisters.ObjectTempTwo, 1000), Temp.Fahrenheit);
-//_obj2K = CalculateTemp(Controller.TwiBus.ReadRegister(Config, (byte) RamRegisters.ObjectTempTwo, 1000), Temp.Kelvin);
-//_areaC = CalculateTemp(Controller.TwiBus.ReadRegister(Config, (byte) RamRegisters.AreaTemperature, 1000),Temp.Celcius);
-//_areaF = CalculateTemp(Controller.TwiBus.ReadRegister(Config, (byte) RamRegisters.AreaTemperature, 1000), Temp.Fahrenheit);
-//_areaK = CalculateTemp(Controller.TwiBus.ReadRegister(Config, (byte) RamRegisters.AreaTemperature, 1000), Temp.Kelvin);                                   
+                                  

@@ -6,6 +6,8 @@ using HomeAutomation.Abstract;
 using HomeAutomation.Components.Displays.LCD;
 using HomeAutomation.Components.Sensors;
 using HomeAutomation.Controllers;
+using HomeAutomation.Etc.Generic;
+using HomeAutomation.Network;
 using Json.NETMF;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
@@ -20,7 +22,9 @@ namespace HomeAutomation
     {
         public static void Main()
         {
-            var netduino = new NetDuinoPlus2(IPAddress.Parse("192.168.168.101"),420);
+            var serverConnection = new ServerConnection(IPAddress.Parse("192.168.168.101"),420);
+
+            var netduino = new NetDuinoPlus2(serverConnection);
             var device = new Device(netduino);
 
             device.ActivateMotionSense(true);
@@ -42,13 +46,16 @@ namespace HomeAutomation
         public IrTempSensor TempSensor { get; private set; }
         public MotionSensor MotionSensor { get; private set; }
 
+        public List ComponentList;
+
         public Device(IController controller)
-        {
+        {       
+            InitComponents(controller);
             Controller = controller;
-            CreateDevices(Controller);
+            
         }
 
-        private void CreateDevices(IController controller)
+        private void InitComponents(IController controller)
         {
             LcdDisplay = new Lmb162Abc(Pins.GPIO_PIN_D12, Pins.GPIO_PIN_D11,                               //rs and enable
                             Pins.GPIO_PIN_D5, Pins.GPIO_PIN_D4, Pins.GPIO_PIN_D3, Pins.GPIO_PIN_D2,         //data pins, d4-d7
@@ -56,6 +63,7 @@ namespace HomeAutomation
             TempSensor = new IrTempSensor(0x5a, 59, controller);
             MotionSensor = new MotionSensor(Pins.GPIO_PIN_D7, controller);
             
+            ComponentList = new List(typeof(IComponent)) { LcdDisplay, TempSensor, MotionSensor };
         }
 
         public void ActivateMotionSense(bool activate) //active by default
@@ -88,9 +96,12 @@ namespace HomeAutomation
         private void AlarmTripped()
         {
             LcdDisplay.SetCursor(0,1);
-            LcdDisplay.WriteLine("Motion Detected",0,true);
+            LcdDisplay.WriteLine("Motion Detected ",0,true);
+
             Thread.Sleep(1000);
-            LcdDisplay.WriteLine("All Clear",0,true);
+
+            LcdDisplay.SetCursor(0, 1);
+            LcdDisplay.WriteLine("All Clear       ",0,true);
         }
     }
 }

@@ -17,9 +17,9 @@ namespace HomeAutomation.Components.Sensors
 
         public MotionSensor(Cpu.Pin inputPin, IController controller)
         {
-            _pir = new InterruptPort(inputPin, false, ResistorModes.PullDown, InterruptModes.InterruptEdgeHigh);
             Controller = controller;
-            //Controller.AddComponent(this);
+            
+            _pir = new InterruptPort(inputPin, false, ResistorModes.PullDown, InterruptModes.InterruptEdgeHigh);
             _pir.OnInterrupt += OnMotionDetected;
         }
         private void OnMotionDetected(uint data1, uint data2, DateTime time)

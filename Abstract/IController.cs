@@ -8,11 +8,7 @@ namespace HomeAutomation.Abstract
 {
     public interface IController
     {
+        ConnectionManager NetDaemon { get; }
         
-        //void AddComponent(IComponent component);
-        I2CBus TwiBus { get; }
-        NetworkDaemon NetDaemon { get; }
-        IPAddress ServerIp { get; }
-        int ServerPort { get; }
     }
 }
