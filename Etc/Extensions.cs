@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using HomeAutomation.Etc.Delegates;
 
-namespace HomeAutomation.Etc.Generic
+namespace HomeAutomation.Etc
 {
     public static class Extensions
     {

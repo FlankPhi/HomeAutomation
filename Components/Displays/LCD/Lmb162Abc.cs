@@ -45,7 +45,7 @@ namespace HomeAutomation.Components.Displays.LCD
             Font5X11 = 0x04,
             Font5X8 = 0x00
         }
-        public IController Controller { get; private set; }
+
         private bool _isVisible;
         private bool _showCursor;
         private bool _isBlinking;
@@ -89,12 +89,10 @@ namespace HomeAutomation.Components.Displays.LCD
         public Lmb162Abc(Cpu.Pin rsPin, Cpu.Pin enablePin,
             Cpu.Pin d4, Cpu.Pin d5, Cpu.Pin d6, Cpu.Pin d7, int columnCount, int rowCount, IController controller)
         {
-            Controller = controller;
             _transferProtocol = new LcdGpioTransferProtocol(rsPin, enablePin, d4, d5, d6, d7);
             ColumnCount = columnCount;
             RowCount = rowCount;
-            _transferProtocol.Initialize(this);                      
-            //Controller.AddComponent(this);
+            _transferProtocol.Initialize(this);                                
         }
 
         public void WriteLine(string text)
@@ -106,17 +104,14 @@ namespace HomeAutomation.Components.Displays.LCD
         {
             _transferProtocol.SendLine(text, delay, newLine);
         }
-
         public void Write(string text)
         {
             _transferProtocol.SendLine(text,0,false);
         }
-
         public void Clear()
         {
             _transferProtocol.SendCommand((byte)Command.Clear);
         }
-
         public void SetCursor(byte column, byte row)
         {
             _transferProtocol.MoveCursor(column, row);

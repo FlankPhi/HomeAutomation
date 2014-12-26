@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using HomeAutomation.Etc.Delegates;
 
-namespace HomeAutomation.Etc.Generic
+namespace HomeAutomation.Etc
 {
     sealed class ConditionalEnumerator : IEnumerator, IDisposable
     {

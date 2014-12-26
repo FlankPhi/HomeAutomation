@@ -8,7 +8,7 @@ namespace HomeAutomation.Abstract
 {
     public interface IController
     {
-        ConnectionManager NetDaemon { get; }
+        TcpConnectionManager ConnectionManager { get; }
         
     }
 }

@@ -4,7 +4,7 @@ namespace HomeAutomation.Abstract
 {
     public interface IComponent
     {
-        IController Controller { get; }
-        
+        //Hmm... is this worth having? What should I put here?
+        //Apparently this is a marker interface.
     }
 }

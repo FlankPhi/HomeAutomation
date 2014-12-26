@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Net.Sockets;
 
-namespace HomeAutomation.Etc.Generic
+namespace HomeAutomation.Etc
 {
     public class List : IEnumerable
     {

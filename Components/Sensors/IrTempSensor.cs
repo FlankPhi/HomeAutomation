@@ -2,23 +2,22 @@ using System;
 using System.Threading;
 using HomeAutomation.Abstract;
 using HomeAutomation.Controllers;
+using HomeAutomation.Etc.Delegates;
 using Microsoft.SPOT.Hardware;
 
 namespace HomeAutomation.Components.Sensors
 {
-    
-    public delegate void TemperatureUpdate(object sender, double temp);
     public class IrTempSensor : IComponent, IDisposable
     {
 
-        public event TemperatureUpdate TempUpdate;
+        public event Update SensorUpdate;
         public int UpdateInterval { get; set; }
         public RamRegisters DefaultRegister { get; set; }
         public Temp DefaultTemp { get; set; }
-        public IController Controller { get; private set; }
         
+        private readonly IController _controller;
         private readonly I2CDevice.Configuration _config;
-        private readonly Thread _dataThread;
+        private Thread _dataThread;
         private double _latestTemp;
 
         public IrTempSensor(byte i2CAddress, byte frequency, IController controller, 
@@ -26,22 +25,33 @@ namespace HomeAutomation.Components.Sensors
             int updateInterval = 2500)
         {
             _config = new I2CDevice.Configuration(i2CAddress, frequency);
-            Controller = controller;
+            _controller = controller;
 
             DefaultRegister = defaultRegister;
             DefaultTemp = defaultTemp;
             UpdateInterval = updateInterval;
 
+            
+            
+        }
+
+        public void Start()
+        {
             _dataThread = new Thread(UpdateTemps);
             _dataThread.Start();
-            
+        }
+
+        public void Stop()
+        {
+            if (_dataThread == null) return;
+            _dataThread.Abort();
         }
         private void UpdateTemps()
         {
             while (true)
             {
                 Thread.Sleep(UpdateInterval);
-                _latestTemp = CalculateTemp(((NetDuinoPlus2)Controller).TwiBus.ReadRegister(_config, (byte)DefaultRegister, 1000), DefaultTemp);
+                _latestTemp = CalculateTemp(((NetDuinoPlus2)_controller).TwiBus.ReadRegister(_config, (byte)DefaultRegister, 1000), DefaultTemp);
                 OnUpdate();
             }
         }
@@ -71,7 +81,7 @@ namespace HomeAutomation.Components.Sensors
 
         private void OnUpdate()
         {
-            if (TempUpdate != null) TempUpdate(this, _latestTemp);
+            if (SensorUpdate != null) SensorUpdate(this, _latestTemp);
         }
         public enum RamRegisters : byte
         {

@@ -2,22 +2,21 @@ using System.Net;
 using HomeAutomation.Abstract;
 using HomeAutomation.Components.Displays.LCD.Transfer_Protocols;
 using HomeAutomation.Etc.Delegates;
-using HomeAutomation.Etc.Generic;
 using HomeAutomation.Network;
 
 namespace HomeAutomation.Controllers
 {
     public sealed class NetDuinoPlus2 : IController
     {
-  
-        public ConnectionManager NetDaemon { get; private set; }
+
+        public TcpConnectionManager ConnectionManager { get; private set; }
         public I2CBus TwiBus { get; private set; }
-        
-        public NetDuinoPlus2(ServerConnection connection)
+
+        public NetDuinoPlus2(TcpConnectionManager manager)
         {
             
             TwiBus = I2CBus.GetInstance();
-            NetDaemon = new ConnectionManager(connection);
+            ConnectionManager = manager;
         }
     }
 }
