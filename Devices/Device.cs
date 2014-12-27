@@ -27,7 +27,7 @@ namespace HomeAutomation
             TempSensor = new IrTempSensor(0x5a, 59, controller,updateInterval:1000);
             MotionSensor = new MotionSensor(Pins.GPIO_PIN_D8);
             Controller = controller;
-            ((TcpConnectionManager)ConnectionManager).CommandHandler.Init();
+            ((TcpConnectionManager)ConnectionManager).TcpCommandHandler.Init();
         } 
         
     }    

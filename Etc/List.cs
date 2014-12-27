@@ -35,6 +35,11 @@ namespace HomeAutomation.Etc
             _index++;
         }
 
+        public ArrayList GetArrayList()
+        {
+            return _list;
+            
+        }
         public void Clear()
         {
             _list.Clear();
