@@ -15,23 +15,15 @@ namespace HomeAutomation.Network
         public int DataPort { get; private set; }
         public int DebugPort { get; private set; }
 
-        private readonly EndPoint _dataEndPoint;
-        private readonly EndPoint _debugEndPoint;
-
-
-        public SingleDataConnection(IPAddress remoteAddress, int dataPort, int debugPort = 59400)
+        public SingleDataConnection(IPAddress remoteAddress, int dataPort, bool connect = true, int debugPort = 59400)
         {
             RemoteIpAddress = remoteAddress;
             DataPort = dataPort;
             DebugPort = debugPort;
 
             DebugSocket = new Socket(AddressFamily.InterNetwork,SocketType.Stream, ProtocolType.Tcp);
-            DataSocket = new Socket(AddressFamily.InterNetwork,SocketType.Stream, ProtocolType.Tcp);
-
-            _dataEndPoint = new IPEndPoint(RemoteIpAddress, DataPort);
-            _debugEndPoint = new IPEndPoint(RemoteIpAddress, DebugPort);
-            
-            Connect();
+            DataSocket = new Socket(AddressFamily.InterNetwork,SocketType.Stream, ProtocolType.Tcp);    
+            if(connect) Connect();        
         }
 
         public void Connect()

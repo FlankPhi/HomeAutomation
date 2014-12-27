@@ -1,14 +1,23 @@
 using System;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using HomeAutomation.Abstract;
+using HomeAutomation.Components.Displays.LCD;
+using HomeAutomation.Etc;
+using HomeAutomation.Etc.Delegates;
 using Microsoft.SPOT;
+using SecretLabs.NETMF.Hardware.Netduino;
 
 namespace HomeAutomation.Network
 {
-    public class TcpConnectionManager : IConnectionManager
+    public delegate void Command(byte value);
+    public sealed class TcpConnectionManager : IConnectionManager
     {
+        public event Command CommandReceived;
+
+        private Thread _listenThread;
         public int KeepAliveTime { get; set; }
         private bool _keepAliveActive;
         public bool KeepAliveActive
@@ -17,6 +26,7 @@ namespace HomeAutomation.Network
             set { UpdateKeepAlive(value); }
         }
 
+        private List _commandList;
         private void UpdateKeepAlive(bool active)
         {
             var keepAliveThread = new Thread(KeepAlive);
@@ -36,23 +46,49 @@ namespace HomeAutomation.Network
 
         public IConnection Connection { get; private set; }
 
-        private ITcpConnection _tcpConnection;
-        //private List _serverConnections;
-        public TcpConnectionManager(IConnection connection)
+        private readonly ITcpConnection _tcpConnection;
+        public CommandHandler CommandHandler { get; private set; }
+
+        public TcpConnectionManager(IDevice dev, IConnection connection)
         {
-            //_serverConnections = new List(typeof(ServerConnection));
-            //_serverConnections.Add(connection);
             Connection = connection;
-            _tcpConnection = (ITcpConnection)connection;
+            _tcpConnection = (ITcpConnection)Connection;
+            var device = (Device) dev;
+            
+            CommandHandler = new CommandHandler(this,device);
+
+            _listenThread = new Thread(ProcessCommands);
+            _listenThread.Start();
+            
+            
         }
-        
+
+        private void ProcessCommands()      //Maybe refactor this someday to handle more than just a single byte, and to check whether more than just a single byte was sent...
+        {                                   //
+            while (true)                    //
+            {
+                Thread.Sleep(10);
+                if (_tcpConnection.DataSocket == null) continue;
+
+                var bytes = GetByteArray(_tcpConnection, _tcpConnection.DataSocket, 1, 0, 3000);
+                if (bytes == null) continue;
+
+                var command = CommandHandler.ServerCommands.FirstOrDefault(p => ((byte) p) == bytes[0]);
+                if (command == null) continue;
+                
+                OnCommandReceived((byte)command);                
+            }
+        }
+
+       
+
         private void KeepAlive() // bug - this is becoming more and more sloppy - a send and receive in the same method? talk about breaking srp... maybe plug it into server connection?
         {
             while (true)
             {
                 Thread.Sleep(KeepAliveTime);
 
-                if (!SendUtf8(_tcpConnection.DebugSocket, "Hello?"))
+                if (!SendUtf8(_tcpConnection.DataSocket, "Hello?")) //changing temporarily - debugsocket to datasocket
                 {
                     _tcpConnection.Connect();
                     continue;
@@ -72,7 +108,7 @@ namespace HomeAutomation.Network
         {
             return socket.Available == 0 ? null : connection.ReceiveData(socket, timeout, size, offset);
         }
-        private static bool SendUtf8(Socket socket, object data)
+        public bool SendUtf8(Socket socket, object data)
         {
             if (socket == null) return false;
             try
@@ -87,6 +123,11 @@ namespace HomeAutomation.Network
             }
             
 
+        }
+
+        private void OnCommandReceived(byte value)
+        {
+            if (CommandReceived != null) CommandReceived.Invoke(value);
         }
     }
 

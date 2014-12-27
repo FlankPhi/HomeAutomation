@@ -36,6 +36,7 @@
     <Compile Include="Abstract\IConnection.cs" />
     <Compile Include="Abstract\IDisplay.cs" />
     <Compile Include="Abstract\IDevice.cs" />
+    <Compile Include="Network\CommandHandler.cs" />
     <Compile Include="Etc\Delegates\Update.cs" />
     <Compile Include="Etc\Delegates\Trigger.cs" />
     <Compile Include="Devices\Device.cs" />

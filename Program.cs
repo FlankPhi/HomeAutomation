@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Net;
 using System.Threading;
 using HomeAutomation.Components.Sensors;
 using HomeAutomation.Controllers;
-using HomeAutomation.Devices;
+//using HomeAutomation.Devices;
+using HomeAutomation.Etc.Delegates;
 using HomeAutomation.Network;
 using Json.NETMF;
 using Microsoft.SPOT;
@@ -17,41 +17,28 @@ namespace HomeAutomation
 {
     public static class Program
     {
-        private static Device _device;
+ 
         public static void Main()
         {
-            var serverConnection = new SingleDataConnection(IPAddress.Parse("192.168.168.101"),420);
-            var connectionManager = new TcpConnectionManager(serverConnection) { KeepAliveActive = true, KeepAliveTime = 30000 };
-            var netduino = new NetDuinoPlus2(connectionManager);
-            _device = new Device(netduino);
+            // Usage - first, instantiate an IDevice.
+            // Then, instantiate an IConnection, and pass both the device and connection into
+            // an instantiated IConnectionManager.  Then pass the IConnectionManager to an instantiated
+            // IController. Finally, initialize the device, passing in your controller.
+            // Any components should be added in your particular Device class
+            // Any commands added should be placed in the CommandHandler class - instructions included.
 
-            _device.TempSensor.Start();
-            _device.TempSensor.SensorUpdate += TempUpdated;
-            _device.MotionSensor.MotionTriggered += MotionDetected;
+            var device = new Device(); 
+            var serverConnection = new SingleDataConnection(IPAddress.Parse("192.168.168.101"),420);
+            var connectionManager = new TcpConnectionManager(device, serverConnection) { KeepAliveActive = true, KeepAliveTime = 30000 };
+            var netduino = new NetDuinoPlus2(connectionManager);
+
+            device.Init(netduino);
             
-                      
             while (true)
             {               
                 Debug.Print("Available RAM: " + Debug.GC(true));
                 Thread.Sleep(30000);
             }          
-        }
-
-        private static void TempUpdated(object sender, double value)
-        {
-            _device.LcdDisplay.SetCursor(11, 0);
-            _device.LcdDisplay.WriteLine(value.ToString().Substring(0,5));
-        }
-
-        private static void MotionDetected()
-        {
-            _device.LcdDisplay.SetCursor(0, 1);
-            _device.LcdDisplay.WriteLine("Motion Detected ", 0, true);
-
-            Thread.Sleep(1000);
-
-            _device.LcdDisplay.SetCursor(0, 1);
-            _device.LcdDisplay.WriteLine("All Clear       ", 0, true);
         }
     }
 }

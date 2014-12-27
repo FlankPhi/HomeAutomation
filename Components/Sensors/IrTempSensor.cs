@@ -1,4 +1,5 @@
 using System;
+using System.Net.Sockets;
 using System.Threading;
 using HomeAutomation.Abstract;
 using HomeAutomation.Controllers;
@@ -14,13 +15,13 @@ namespace HomeAutomation.Components.Sensors
         public int UpdateInterval { get; set; }
         public RamRegisters DefaultRegister { get; set; }
         public Temp DefaultTemp { get; set; }
-        
+        public double CurrentTemp { get; private set; }
+
         private readonly IController _controller;
         private readonly I2CDevice.Configuration _config;
         private Thread _dataThread;
-        private double _latestTemp;
 
-        public IrTempSensor(byte i2CAddress, byte frequency, IController controller, 
+        public IrTempSensor(byte i2CAddress, byte frequency, IController controller, bool startedByDefault = true, 
             RamRegisters defaultRegister = RamRegisters.ObjectTempOne, Temp defaultTemp = Temp.Fahrenheit, 
             int updateInterval = 2500)
         {
@@ -30,6 +31,8 @@ namespace HomeAutomation.Components.Sensors
             DefaultRegister = defaultRegister;
             DefaultTemp = defaultTemp;
             UpdateInterval = updateInterval;
+            
+            if(startedByDefault) Start();
 
             
             
@@ -51,7 +54,7 @@ namespace HomeAutomation.Components.Sensors
             while (true)
             {
                 Thread.Sleep(UpdateInterval);
-                _latestTemp = CalculateTemp(((NetDuinoPlus2)_controller).TwiBus.ReadRegister(_config, (byte)DefaultRegister, 1000), DefaultTemp);
+                CurrentTemp = CalculateTemp(((NetDuinoPlus2)_controller).TwiBus.ReadRegister(_config, (byte)DefaultRegister, 1000), DefaultTemp);
                 OnUpdate();
             }
         }
@@ -81,7 +84,7 @@ namespace HomeAutomation.Components.Sensors
 
         private void OnUpdate()
         {
-            if (SensorUpdate != null) SensorUpdate(this, _latestTemp);
+            if (SensorUpdate != null) SensorUpdate(this, CurrentTemp);
         }
         public enum RamRegisters : byte
         {
