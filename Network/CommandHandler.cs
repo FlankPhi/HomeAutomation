@@ -6,6 +6,7 @@ using HomeAutomation.Components.Sensors;
 using HomeAutomation.Etc;
 using HomeAutomation.Etc.Delegates;
 using HomeAutomation.Network;
+using Microsoft.SPOT.Hardware;
 
 namespace HomeAutomation
 {
@@ -14,7 +15,7 @@ namespace HomeAutomation
         private readonly IDevice _device;
         private readonly TcpConnectionManager _connectionManager;
 
-       
+        
         //Adding a command here means a) adding a corresponding private function and 
         //                            b) Subscribing the method to CmdReceived event in Init() method
         //                            c) unsubscribing to that event in Dispose() method
@@ -32,16 +33,6 @@ namespace HomeAutomation
             {"Start Motion Sensor Notifications",(byte) 0x09},
             {"Stop Motion Sensor Notifications",(byte) 0x0A},            
         };
-        
-
-        private void SendCommandTable(byte command)
-        {
-            if (command != 0x00) return;
-
-            _connectionManager.SendJson(
-                ((SingleDataConnection) _connectionManager.Connection).DataSocket, ServerCommandTable);            
-        }
-
         public void Init()
         {         
             ((Device)_device).TempSensor.SensorUpdate += TempUpdated;
@@ -71,6 +62,15 @@ namespace HomeAutomation
             _connectionManager.CommandReceived -= SwitchToObject2;
             _connectionManager.CommandReceived -= SwitchToArea1;
 
+        }
+
+        #region Command Methods  
+        private void SendCommandTable(byte command)
+        {
+            if (command != 0x00) return;
+
+            _connectionManager.SendJson(
+                ((SingleDataConnection)_connectionManager.Connection).DataSocket, ServerCommandTable);
         }
 
         private void SwitchToArea1(byte command)
@@ -129,20 +129,16 @@ namespace HomeAutomation
             if (command != 0x04) return;
             ((Device)_device).TempSensor.DefaultTemp = IrTempSensor.Temp.Fahrenheit;
         }
-
         private void SwitchToKelvin(byte command)
         {
             if (command != 0x05) return;
             ((Device)_device).TempSensor.DefaultTemp = IrTempSensor.Temp.Kelvin;
         }
-
-
         private void TempUpdated(object sender, object value)
         {
             ((Device)_device).LcdDisplay.SetCursor(11, 0);
             ((Device)_device).LcdDisplay.WriteLine(value.ToString().Substring(0, 5));
         }
-
         private void MotionDetected()
         {
             ((Device)_device).LcdDisplay.SetCursor(0, 1);
@@ -153,7 +149,7 @@ namespace HomeAutomation
             ((Device)_device).LcdDisplay.SetCursor(0, 1);
             ((Device)_device).LcdDisplay.WriteLine("All Clear       ", 0, true);
         }
-
+#endregion Command Methods  
         
         #region Constructor
         public TcpCommandHandler(TcpConnectionManager connectionManager, IDevice device)
